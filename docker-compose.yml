@@ -1,0 +1,44 @@
+name: vdf-nas-studio
+services:
+  studio:
+    image: jieyousuozhang/vdf-nas-studio:latest
+    platform: linux/amd64
+    init: true
+    restart: unless-stopped
+    pull_policy: always
+    user: "1000:1001"                 # 按你的飞牛用户 UID:GID 修改
+    ports:
+      - "8098:8098"
+    cpus: 2.0
+    cpu_shares: 512
+    pids_limit: 256
+    stop_grace_period: 20s
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    group_add:
+      - "105"                        # 按实际 render 设备组 GID 修改
+    environment:
+      VDF_PASSWORD: "ChangeThis_ToYourOwnLongPassword"
+      VDF_DEFAULT_HW_ACCEL: vaapi
+      LIBVA_DRIVER_NAME: iHD
+      VDF_ALLOW_FILE_ACTIONS: "true"
+      VDF_RECYCLE_BACKEND: fnos
+      VDF_FNOS_USER_ROOT: /fnos-user
+      VDF_FNOS_MEDIA_RELATIVE: 视频    # 对应下方用户根目录里的共享目录名
+      VDF_FNOS_UID: "1000"            # 与上方 UID 及回收站所属用户一致
+      VDF_SECURE_COOKIE: "false"
+      VDF_CACHE_GB: "4"
+      VDF_SCAN_TIMEOUT_HOURS: "72"
+    volumes:
+      - ./data:/data:rw
+      - /vol1/1000/视频:/media:rw       # 示例：要扫描的共享目录
+      - /vol1/1000:/fnos-user:rw        # 示例：同一共享所属的用户根目录
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

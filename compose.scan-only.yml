@@ -1,0 +1,30 @@
+name: vdf-nas-studio
+services:
+  studio:
+    image: jieyousuozhang/vdf-nas-studio:latest
+    platform: linux/amd64
+    init: true
+    restart: unless-stopped
+    pull_policy: always
+    user: "1000:1001"
+    ports:
+      - "8098:8098"
+    cpus: 2.0
+    cpu_shares: 512
+    pids_limit: 256
+    stop_grace_period: 20s
+    environment:
+      VDF_PASSWORD: "ChangeThis_ToYourOwnLongPassword"
+      VDF_DEFAULT_HW_ACCEL: none
+      VDF_ALLOW_FILE_ACTIONS: "false"
+      VDF_RECYCLE_BACKEND: local
+      VDF_SECURE_COOKIE: "false"
+      VDF_CACHE_GB: "4"
+      VDF_SCAN_TIMEOUT_HOURS: "72"
+    volumes:
+      - ./data:/data:rw
+      - /path/to/videos:/media:ro       # 修改为你的真实媒体目录
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
